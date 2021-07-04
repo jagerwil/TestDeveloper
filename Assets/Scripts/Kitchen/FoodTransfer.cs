@@ -25,7 +25,7 @@ namespace CookingPrototype.Kitchen {
 			}
 
 			if ( OnlyTransferCooked && (food.CurStatus != Food.FoodStatus.Cooked) ) {
-				_place.TryPlaceFood(food);
+				//_place.TryPlaceFood(food);
 				return;
 			}
 			foreach ( var place in DestPlaces ) {

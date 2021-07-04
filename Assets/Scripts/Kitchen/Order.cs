@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -13,7 +14,7 @@ namespace CookingPrototype.Kitchen {
 			}
 		}
 
-		public readonly string               Name;
+		public string Name { get; } = null;
 		public ReadOnlyCollection<OrderFood> Foods { get { return _foods.AsReadOnly(); } }
 
 		List<OrderFood> _foods;

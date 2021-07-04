@@ -38,7 +38,7 @@ namespace CookingPrototype.Kitchen {
 		void UpdatePossibleOrders() {
 			var ordersToRemove = new List<Order>();
 			foreach ( var order in _possibleOrders ) {
-				if ( order.Foods.Where(x => x.Name == CurOrder[CurOrder.Count - 1]).Count() == 0 ) {
+				if ( order.Foods.All(x => x.Name != CurOrder[CurOrder.Count - 1]) ) {
 					ordersToRemove.Add(order);
 				}
 			}

@@ -16,7 +16,7 @@ namespace CookingPrototype.Kitchen {
 
 		const string ORDERS_PREFABS_PATH = "Prefabs/Orders/{0}";
 
-		List<Order> _orders   = null;
+		private List<Order> _orders   = null;
 		float       _timer    = 0f;
 		bool        _isActive = false;
 
@@ -57,8 +57,8 @@ namespace CookingPrototype.Kitchen {
 
 			OrderPlaces.ForEach(x => x.Complete());
 
-			var i = 0;
-			for ( ; i < _orders.Count; i++ ) {
+			
+			for (int i = 0; i < _orders.Count; i++ ) {
 				var order   = _orders[i];
 				var place   = OrderPlaces[i];
 				Instantiate(Resources.Load<GameObject>(string.Format(ORDERS_PREFABS_PATH, order.Name)), place.transform, false);

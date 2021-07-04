@@ -1,5 +1,5 @@
 using System;
-
+using System.Collections;
 using UnityEngine;
 
 using CookingPrototype.Kitchen;
@@ -12,14 +12,14 @@ namespace CookingPrototype.Controllers {
 		public static GameplayController Instance { get; private set; }
 
 		public GameObject TapBlock   = null;
+		public StartWindow StartWindow = null;
 		public WinWindow  WinWindow  = null;
 		public LoseWindow LoseWindow = null;
-
 
 		int _ordersTarget = 0;
 
 		public int OrdersTarget {
-			get { return _ordersTarget; }
+			get => _ordersTarget;
 			set {
 				_ordersTarget = value;
 				TotalOrdersServedChanged?.Invoke();
@@ -35,8 +35,14 @@ namespace CookingPrototype.Controllers {
 				Debug.LogError("Another instance of GameplayController already exists");
 			}
 			Instance = this;
+
+			TotalOrdersServedChanged += StartWindow.UpdateGoalText;
 		}
 
+		void Start() {
+			ShowStartWindow();
+		}
+		
 		void OnDestroy() {
 			if ( Instance == this ) {
 				Instance = null;
@@ -45,7 +51,7 @@ namespace CookingPrototype.Controllers {
 
 		void Init() {
 			TotalOrdersServed = 0;
-			Time.timeScale = 1f;
+			Time.timeScale = 0f;
 			TotalOrdersServedChanged?.Invoke();
 		}
 
@@ -53,6 +59,17 @@ namespace CookingPrototype.Controllers {
 			if ( CustomersController.Instance.IsComplete ) {
 				EndGame(TotalOrdersServed >= OrdersTarget);
 			}
+		}
+
+		void ShowStartWindow() {
+			Time.timeScale = 0f;
+			TapBlock?.SetActive(true);
+			StartWindow.Show();
+		}
+
+		public void StartGame() {
+			Time.timeScale = 1f;
+			HideWindows();
 		}
 
 		void EndGame(bool win) {
@@ -67,6 +84,7 @@ namespace CookingPrototype.Controllers {
 
 		void HideWindows() {
 			TapBlock?.SetActive(false);
+			StartWindow?.Hide();
 			WinWindow?.Hide();
 			LoseWindow?.Hide();
 		}
@@ -91,6 +109,8 @@ namespace CookingPrototype.Controllers {
 			foreach ( var place in FindObjectsOfType<AbstractFoodPlace>() ) {
 				place.FreePlace();
 			}
+			
+			ShowStartWindow();
 		}
 
 		public void CloseGame() {

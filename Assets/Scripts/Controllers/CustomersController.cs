@@ -51,9 +51,7 @@ namespace CookingPrototype.Controllers {
 			}
 		}
 
-		void Start() {
-			Init();
-		}
+		void Start() => Init();
 
 		void Update() {
 			if ( !HasFreePlaces ) {
@@ -62,7 +60,7 @@ namespace CookingPrototype.Controllers {
 
 			_timer += Time.deltaTime;
 
-			if ( (TotalCustomersGenerated >= CustomersTargetNumber) || (!(_timer > CustomerSpawnTime)) ) {
+			if ( TotalCustomersGenerated >= CustomersTargetNumber || _timer < CustomerSpawnTime ) {
 				return;
 			}
 
@@ -114,7 +112,7 @@ namespace CookingPrototype.Controllers {
 
 			TotalCustomersGenerated = 0;
 			TotalCustomersGeneratedChanged?.Invoke();
-			 
+
 			GameplayController.Instance.OrdersTarget = totalOrders - 2;
 		}
 
@@ -139,7 +137,35 @@ namespace CookingPrototype.Controllers {
 		/// <param name="order">Заказ, который пытаемся отдать</param>
 		/// <returns>Флаг - результат, удалось ли успешно отдать заказ</returns>
 		public bool ServeOrder(Order order) {
-			throw  new NotImplementedException("ServeOrder: this feature is not implemented.");
+			if ( order == null ) return false;
+			
+			Customer customerToServe = null;
+			float minRemainingTime = float.MaxValue;
+
+			foreach ( var customerPlace in CustomerPlaces ) {
+				var curCustomer = customerPlace.CurCustomer;
+				if ( curCustomer == null ) continue;
+
+				foreach ( var customerOrder in curCustomer.OrderPlaces ) {
+					if ( customerOrder == null || customerOrder.CurOrder == null 
+					     || customerOrder.CurOrder.Name != order.Name || curCustomer.WaitTime >= minRemainingTime) {
+						continue;
+					}
+
+					customerToServe = curCustomer;
+					minRemainingTime = curCustomer.WaitTime;
+					break;
+				}
+			}
+
+			if ( customerToServe == null ) return false;
+
+			customerToServe.ServeOrder(order);
+			if ( customerToServe.IsComplete ) {
+				FreeCustomer(customerToServe);
+			}
+			
+			return true;
 		}
 	}
 }
